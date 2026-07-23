@@ -143,17 +143,24 @@
       radial-gradient(circle at 15% 85%, rgba(18,121,214,.25), transparent 45%);
     pointer-events:none;
   }
-  .droplet{
-    position:absolute;border-radius:50%;
-    background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.5), rgba(94,200,255,.05) 70%);
-    filter:blur(1px);
-    animation:float 9s ease-in-out infinite;
-    pointer-events:none;
+  /* Herramientas de limpieza que recorren el fondo lentamente. */
+  .cleaning-tools{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;}
+  .cleaning-tool{position:absolute;width:88px;filter:drop-shadow(0 12px 12px rgba(0,0,0,.25));opacity:.92;}
+  .cleaning-tool.sponge{top:17%;right:7%;animation:clean-sponge 12s ease-in-out infinite;}
+  .cleaning-tool.brush{bottom:13%;right:12%;width:106px;animation:clean-brush 15s ease-in-out infinite;}
+  @keyframes clean-sponge{0%,100%{transform:translate(0,0) rotate(-12deg)}50%{transform:translate(-125px,36px) rotate(13deg)}}
+  @keyframes clean-brush{0%,100%{transform:translate(0,0) rotate(18deg)}50%{transform:translate(-180px,-34px) rotate(-9deg)}}
+  .photo-wipe{
+    position:fixed;inset:0;z-index:90;pointer-events:none;opacity:0;
+    background:#061b30 center/cover no-repeat;
+    clip-path:circle(0 at var(--wipe-x, 50%) var(--wipe-y, 50%));
+    transition:opacity .25s ease, clip-path .08s linear;
   }
-  @keyframes float{
-    0%,100%{transform:translateY(0) translateX(0);}
-    50%{transform:translateY(-26px) translateX(10px);}
-  }
+  body.is-cleaning{cursor:grabbing;user-select:none;}
+  body.is-cleaning .photo-wipe{opacity:.88;clip-path:circle(24vmax at var(--wipe-x, 50%) var(--wipe-y, 50%));}
+  body.is-cleaning a,body.is-cleaning button{cursor:grabbing;}
+  .cleaning-hint{position:absolute;bottom:30px;right:32px;z-index:3;color:rgba(255,255,255,.8);font:500 11px 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;}
+  @media(max-width:600px){.cleaning-tool{transform:scale(.7)}.cleaning-tool.sponge{right:-4%}.cleaning-tool.brush{right:0}.cleaning-hint{right:20px;bottom:18px;font-size:9px;}}
   .hero .wrap{
     position:relative;z-index:2;
     display:grid;
@@ -309,7 +316,10 @@
     position:relative;border-radius:20px;overflow:hidden;
     box-shadow:0 24px 50px -22px rgba(12,46,78,.35);
   }
-  .squeegee-card img{width:100%;height:100%;object-fit:cover;display:block;}
+  .squeegee-card{cursor:grab;touch-action:pan-y;}
+  .squeegee-card:active{cursor:grabbing;}
+  .squeegee-card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s var(--ease);}
+  .squeegee-card:hover img,.squeegee-card:active img{transform:scale(1.06);}
   .squeegee-card .fog{
     position:absolute;inset:0;
     background:linear-gradient(120deg,#dfeefb,#c9e2f2);
@@ -490,7 +500,8 @@
       <a href="#contacto">Contacto</a>
     </div>
     <div class="nav-cta">
-      <a href="tel:+18015550123" class="btn btn-ghost">📞 (801) 555-0123</a>
+      <a href="tel:+13853949996" class="btn btn-ghost">📞 (385) 394-9996</a>
+      <a href="tel:+18016718643" class="btn btn-ghost">📞 (801) 671-8643</a>
       <a href="#contacto" class="btn btn-primary">Cotización gratis</a>
     </div>
     <button class="burger" id="burgerBtn">☰</button>
@@ -498,9 +509,11 @@
 </header>
 
 <section class="hero" id="top">
-  <span class="droplet" style="width:14px;height:14px;top:20%;left:8%;"></span>
-  <span class="droplet" style="width:10px;height:10px;top:60%;left:4%;animation-delay:2s;"></span>
-  <span class="droplet" style="width:18px;height:18px;top:75%;left:14%;animation-delay:4s;"></span>
+  <div class="cleaning-tools" aria-hidden="true">
+    <svg class="cleaning-tool sponge" viewBox="0 0 120 82" role="img"><defs><linearGradient id="spongeColor" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffe57b"/><stop offset="1" stop-color="#f5ad31"/></linearGradient></defs><rect x="5" y="8" width="110" height="66" rx="20" fill="url(#spongeColor)" stroke="#fff2b5" stroke-width="4"/><path d="M25 28h12m10 0h12m10 0h12M25 47h12m10 0h12m10 0h12" stroke="#cc811b" stroke-width="5" stroke-linecap="round" opacity=".6"/></svg>
+    <svg class="cleaning-tool brush" viewBox="0 0 150 110" role="img"><path d="M18 82h114l-12 20H30z" fill="#eaf5fb" stroke="#fff" stroke-width="4"/><path d="M31 84l7 16m12-16l7 16m12-16l7 16m12-16l7 16m12-16l7 16m12-16l7 16" stroke="#78b6dd" stroke-width="5"/><path d="M67 8h28v70H67z" rx="12" fill="#1679c8"/><path d="M73 11h16v52H73z" fill="#63cbff" opacity=".75"/></svg>
+  </div>
+  <span class="cleaning-hint">Mantén clic y limpia para ver trabajos</span>
   <div class="wrap">
     <div class="hero-copy">
       <span class="eyebrow">Limpieza residencial en Utah</span>
@@ -694,18 +707,18 @@
       <h2>Pide tu cotización gratis hoy mismo</h2>
       <p>Cuéntanos sobre tu propiedad y el tipo de limpieza que necesitas. Te respondemos el mismo día con un precio claro, sin sorpresas.</p>
       <ul class="contact-list">
-        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.8 19.8 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.8 19.8 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.12.9.34 1.79.65 2.65a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.43-1.22a2 2 0 012.11-.45c.86.31 1.75.53 2.65.65A2 2 0 0122 16.92z"/></svg> (801) 555-0123</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg> hola@procleancrew.com</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.8 19.8 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.8 19.8 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.12.9.34 1.79.65 2.65a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.43-1.22a2 2 0 012.11-.45c.86.31 1.75.53 2.65.65A2 2 0 0122 16.92z"/></svg> <a href="tel:+13853949996" style="color:inherit;">(385) 394-9996</a> · <a href="tel:+18016718643" style="color:inherit;">(801) 671-8643</a></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg> <a href="mailto:procleancrew01@gmail.com" style="color:inherit;">procleancrew01@gmail.com</a></li>
         <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Sirviendo todo el Valle de Salt Lake, UT</li>
       </ul>
     </div>
-    <form class="contact-form" onsubmit="event.preventDefault(); this.querySelector('.btn').textContent='¡Enviado! Te contactaremos pronto ✓';">
+    <form class="contact-form" id="quoteForm">
       <label>Nombre completo</label>
-      <input type="text" placeholder="Tu nombre" required>
+      <input type="text" name="nombre" placeholder="Tu nombre" required>
       <div class="form-row">
-        <div><label>Teléfono</label><input type="tel" placeholder="(801) 000-0000" required></div>
+        <div><label>Teléfono</label><input type="tel" name="telefono" placeholder="(801) 000-0000" required></div>
         <div><label>Ciudad</label>
-          <select required>
+          <select name="ciudad" required>
             <option value="">Selecciona tu ciudad</option>
             <option>Salt Lake City</option>
             <option>West Valley City</option>
@@ -718,7 +731,7 @@
         </div>
       </div>
       <label>Tipo de servicio</label>
-      <select required>
+      <select name="servicio" required>
         <option value="">Selecciona un servicio</option>
         <option>Limpieza residencial</option>
         <option>Move-in / Move-out</option>
@@ -727,7 +740,7 @@
         <option>Oficinas y locales</option>
       </select>
       <label>Cuéntanos sobre tu espacio</label>
-      <textarea placeholder="Tamaño aproximado, fecha deseada, detalles..."></textarea>
+      <textarea name="mensaje" placeholder="Tamaño aproximado, fecha deseada, detalles..."></textarea>
       <button type="submit" class="btn btn-primary">Solicitar cotización gratis</button>
     </form>
   </div>
@@ -765,7 +778,8 @@
         <h5>Contacto</h5>
         <ul class="flinks">
           <li><a href="tel:+13853949996">(385) 394-9996</a></li>
-          <li><a href="mailto:hola@procleancrew.com">hola@procleancrew.com</a></li>
+          <li><a href="tel:+18016718643">(801) 671-8643</a></li>
+          <li><a href="mailto:procleancrew01@gmail.com">procleancrew01@gmail.com</a></li>
           <li><a href="#">Valle de Salt Lake, UT</a></li>
         </ul>
       </div>
@@ -776,6 +790,8 @@
     </div>
   </div>
 </footer>
+
+<div class="photo-wipe" id="photoWipe" aria-hidden="true"></div>
 
 <script>
   // Sticky header shrink
@@ -813,6 +829,66 @@
   }, {threshold:0.3});
   squeegeeCards.forEach(el => sio.observe(el));
 
+  // Live squeegee-wipe interaction on pointer/touch drag — works on PC (mouse),
+  // tablet and mobile (touch) so people can "wipe" the fog off each photo directly.
+  squeegeeCards.forEach(card => {
+    const fog = card.querySelector('.fog');
+    const bar = fog ? fog.querySelector('.bar') : null;
+    if(!fog) return;
+
+    const applyWipe = (clientX) => {
+      const rect = card.getBoundingClientRect();
+      let pct = ((clientX - rect.left) / rect.width) * 100;
+      pct = Math.max(0, Math.min(100, pct));
+      fog.style.clipPath = `inset(0 0 0 ${pct}%)`;
+      if(bar) bar.style.right = `${100 - pct}%`;
+      if(pct > 92){ card.classList.add('wiped'); }
+    };
+
+    const resetWipe = () => {
+      if(card.classList.contains('wiped')) return;
+      fog.style.clipPath = '';
+      if(bar) bar.style.right = '';
+    };
+
+    // Desktop / PC: mouse drag across the image
+    card.addEventListener('mousemove', e => applyWipe(e.clientX));
+    card.addEventListener('mouseleave', resetWipe);
+
+    // Tablet & mobile: touch drag across the image
+    card.addEventListener('touchstart', e => applyWipe(e.touches[0].clientX), {passive:true});
+    card.addEventListener('touchmove', e => applyWipe(e.touches[0].clientX), {passive:true});
+    card.addEventListener('touchend', resetWipe);
+  });
+
+  // Mantén presionado el clic izquierdo para "limpiar" la página con la mano.
+  // Cada gesto revela una de las nuevas fotografías de trabajos realizados.
+  const photoWipe = document.getElementById('photoWipe');
+  const cleaningPhotos = [
+    'pro-clean-bano.jpg',
+    'pro-clean-interior-1.jpg',
+    'pro-clean-cocina.jpg',
+    'pro-clean-interior-2.jpg'
+  ];
+  let cleaning = false;
+  let photoIndex = 0;
+  const moveCleaningHand = (event) => {
+    document.documentElement.style.setProperty('--wipe-x', `${event.clientX}px`);
+    document.documentElement.style.setProperty('--wipe-y', `${event.clientY}px`);
+  };
+  document.addEventListener('pointerdown', event => {
+    if(event.button !== 0 || event.target.closest('a, button, input, select, textarea')) return;
+    cleaning = true;
+    photoWipe.style.backgroundImage = `url("${cleaningPhotos[photoIndex % cleaningPhotos.length]}")`;
+    photoIndex += 1;
+    moveCleaningHand(event);
+    document.body.classList.add('is-cleaning');
+  });
+  document.addEventListener('pointermove', event => { if(cleaning) moveCleaningHand(event); });
+  const stopCleaning = () => { cleaning = false; document.body.classList.remove('is-cleaning'); };
+  document.addEventListener('pointerup', stopCleaning);
+  document.addEventListener('pointercancel', stopCleaning);
+
   // Smooth anchor scroll (offset for fixed header)
   document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', function(e){
@@ -824,6 +900,33 @@
       }
     });
   });
+
+  // Contact form: sends the quote request to procleancrew01@gmail.com (primary inbox)
+  const quoteForm = document.getElementById('quoteForm');
+  if(quoteForm){
+    quoteForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      const data = new FormData(quoteForm);
+      const nombre = (data.get('nombre') || '').toString();
+      const telefono = (data.get('telefono') || '').toString();
+      const ciudad = (data.get('ciudad') || '').toString();
+      const servicio = (data.get('servicio') || '').toString();
+      const mensaje = (data.get('mensaje') || '').toString();
+
+      const subject = `Cotización — ${servicio || 'Solicitud'} (${nombre})`;
+      const body =
+        `Nombre: ${nombre}\n` +
+        `Teléfono: ${telefono}\n` +
+        `Ciudad: ${ciudad}\n` +
+        `Servicio: ${servicio}\n\n` +
+        `Detalles:\n${mensaje}`;
+
+      const mailtoLink = `mailto:procleancrew01@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.location.href = mailtoLink;
+
+      quoteForm.querySelector('.btn').textContent = '¡Enviado! Te contactaremos pronto ✓';
+    });
+  }
 </script>
 
 </body>
